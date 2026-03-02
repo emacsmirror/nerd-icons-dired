@@ -61,6 +61,11 @@
   :group 'nerd-icons
   :type 'function)
 
+(defcustom nerd-icons-dired-icon-size 1.0
+  "The default icon size in Dired."
+  :group 'nerd-icons
+  :type 'float)
+
 (defvar nerd-icons-dired-mode)
 
 (defun nerd-icons-dired--add-overlay (pos string)
@@ -88,10 +93,11 @@
       (when (dired-move-to-filename nil)
         (let ((file (dired-get-filename 'relative 'noerror)))
           (when file
-            (let ((icon (if (file-directory-p file)
-                            (funcall nerd-icons-dired-dir-icon-function file)
-                          (funcall nerd-icons-dired-file-icon-function file)))
-                  (inhibit-read-only t))
+            (let* ((func (if (file-directory-p file)
+                             nerd-icons-dired-dir-icon-function
+                           nerd-icons-dired-file-icon-function))
+                   (icon (funcall func file :height nerd-icons-dired-icon-size))
+                   (inhibit-read-only t))
               (if (member file '("." ".."))
                   (nerd-icons-dired--add-overlay (dired-move-to-filename)
                                                  nerd-icons-dired-special-prefix-string)
